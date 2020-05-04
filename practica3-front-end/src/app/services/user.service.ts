@@ -4,23 +4,31 @@ import { environment } from 'src/environments/environment';
 import { APIResponse } from '../interfaces/interfaces';
 import { Observable } from 'rxjs';
 
+const endPoint =  `${environment.apiUrl}/users`;
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  endPoint = 'users';
+  
 
   constructor(private http: HttpClient) { }
 
   getUserProfile(): Observable<APIResponse> {
-    return this.http.get<APIResponse>(`${environment.apiUrl}/${this.endPoint}/user-profile`,{
+    return this.http.get<APIResponse>(`${endPoint}/user-profile`, {
       headers: this.getHeaders()
     });
   }
 
   getUserBalance(): Observable<APIResponse> {
-    return this.http.get<APIResponse>(`${environment.apiUrl}/${this.endPoint}/balance`,{
+    return this.http.get<APIResponse>(`${endPoint}/balance`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  doTransfer(request: any): Observable<APIResponse> {
+    return this.http.post<APIResponse>(`${endPoint}/transfer`, request, {
       headers: this.getHeaders()
     });
   }
