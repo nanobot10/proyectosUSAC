@@ -60,8 +60,12 @@ public class UserService {
 
 		User user = getUserAuthenticated();
 
-		return new ApiResponse(true, "success",
-				new UserBalance(user.getName(), user.getAccount().getAccountNumber(), user.getAccount().getBalance()));
+		if (user.getAccount() != null) {
+			return new ApiResponse(true, "success", new UserBalance(user.getName(),
+					user.getAccount().getAccountNumber(), user.getAccount().getBalance()));
+		} else {
+			return new ApiResponse(true, "success", new UserBalance(user.getName(), "no account", Double.valueOf(0.0)));
+		}
 
 	}
 
@@ -138,8 +142,8 @@ public class UserService {
 		User user = getUserAuthenticated();
 
 		UserSummaryResponse userSummary = new UserSummaryResponse(user.getId(), user.getUsername(),
-				user.getAccount().getAccountNumber(), user.getUserCode(), mapCredits(user.getCredits()),
-				mapTransactions(user.getTransactions()));
+				(user.getAccount() != null ? user.getAccount().getAccountNumber() : "no account"), user.getUserCode(),
+				mapCredits(user.getCredits()), mapTransactions(user.getTransactions()));
 
 		return new ApiResponse(true, "success", userSummary);
 	}
