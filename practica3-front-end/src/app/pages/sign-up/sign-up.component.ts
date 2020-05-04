@@ -4,6 +4,7 @@ import { FormsService } from '../../services/forms.service';
 import Swal from 'sweetalert2';
 import { RouteReuseStrategy, Router } from '@angular/router';
 import { SignUpService } from '../../services/sign-up.service';
+import { SwalService } from '../../services/swal.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -17,7 +18,8 @@ export class SignUpComponent implements OnInit {
   constructor(private fb: FormBuilder,
               private fv: FormsService,
               private router: Router,
-              private signUpService: SignUpService) { }
+              private signUpService: SignUpService,
+              private swalService: SwalService) { }
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -41,25 +43,14 @@ export class SignUpComponent implements OnInit {
       return this.fv.markFormGroupTouched(this.form);
     }
 
-    Swal.fire({
-      title: 'Espere',
-      text: 'Guardando Información',
-      icon: 'info',
-      allowOutsideClick: false
-    });
-    Swal.showLoading();
-
+    this.swalService.showLoading('Guardando Información');
     this.signUpService.signUp(this.form.value)
       .subscribe( resp => {
 
         if (resp.success) {
 
-          Swal.fire({
-            title: 'Usuario Creado',
-            text: `Tu código de usuario es ${resp.data.userCode}`,
-            icon: 'success',
-            showConfirmButton: true
-          }).then(res => this.router.navigate(['login']));
+          this.swalService.showConfirmButton('Usuario Creado', `Tu código de usuario es ${resp.data.userCode}`)
+            .then(res => this.router.navigate(['login']));
 
         } else {
           Swal.fire({

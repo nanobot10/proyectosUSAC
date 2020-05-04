@@ -8,13 +8,16 @@ public class CreditResponse {
 
 	private Long id;
 	private Instant createdAt;
+	private String description;
 	private String accountNumber;
 	private Double amount;
 	private Status status;
 
-	public CreditResponse(Long id, Status status, String accountNumber, Instant createdAt, Double amount) {
+	public CreditResponse(Long id, Status status, String description, String accountNumber, Instant createdAt,
+			Double amount) {
 		this.id = id;
 		this.status = status;
+		this.setDescription(description);
 		this.accountNumber = accountNumber;
 		this.createdAt = createdAt;
 		this.amount = amount;
@@ -36,14 +39,6 @@ public class CreditResponse {
 		this.createdAt = createdAt;
 	}
 
-	public String getAccountNumber() {
-		return accountNumber;
-	}
-
-	public void setAccountNumber(String accountNumber) {
-		this.accountNumber = accountNumber;
-	}
-
 	public Double getAmount() {
 		return amount;
 	}
@@ -58,6 +53,22 @@ public class CreditResponse {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
 	}
 
 }

@@ -11,8 +11,6 @@ const endPoint =  `${environment.apiUrl}/users`;
 })
 export class UserService {
 
-  
-
   constructor(private http: HttpClient) { }
 
   getUserProfile(): Observable<APIResponse> {
@@ -27,14 +25,26 @@ export class UserService {
     });
   }
 
+  getUserSummary(): Observable<APIResponse> {
+    return this.http.get<APIResponse>(`${endPoint}/user-summary`, {
+      headers: this.getHeaders()
+    });
+  }
+
   doTransfer(request: any): Observable<APIResponse> {
     return this.http.post<APIResponse>(`${endPoint}/transfer`, request, {
       headers: this.getHeaders()
     });
   }
 
+  sendCredit(request: any): Observable<APIResponse> {
+    return this.http.post<APIResponse>(`${endPoint}/credit`, request, {
+      headers: this.getHeaders()
+    });
+  }
+
+
   getHeaders(){
     return { Authorization: `Bearer ${localStorage.getItem('token')}`};
   }
-
 }

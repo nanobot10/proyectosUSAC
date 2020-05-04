@@ -27,7 +27,7 @@ public class CreditService {
 
 	public ApiResponse getAllCredits() {
 		return new ApiResponse(true, "success", creditRepository.findAll().stream()
-				.map(credit -> new CreditResponse(credit.getId(), credit.getStatus(),
+				.map(credit -> new CreditResponse(credit.getId(), credit.getStatus(), credit.getDescription(),
 						credit.getUser().getAccount().getAccountNumber(), credit.getCreatedAt(), credit.getAmount()))
 				.collect(Collectors.toList()));
 	}
@@ -40,8 +40,9 @@ public class CreditService {
 		}
 
 		return new ApiResponse(true, "success",
-				new CreditResponse(id, credit.get().getStatus(), credit.get().getUser().getAccount().getAccountNumber(),
-						credit.get().getCreatedAt(), credit.get().getAmount()));
+				new CreditResponse(id, credit.get().getStatus(), credit.get().getDescription(),
+						credit.get().getUser().getAccount().getAccountNumber(), credit.get().getCreatedAt(),
+						credit.get().getAmount()));
 	}
 
 	public ApiResponse changeCreditStatus(Long id, Status status) {
@@ -68,8 +69,9 @@ public class CreditService {
 		creditRepository.save(credit.get());
 
 		return new ApiResponse(true, "success",
-				new CreditResponse(id, status, credit.get().getUser().getAccount().getAccountNumber(),
-						credit.get().getCreatedAt(), credit.get().getAmount()));
+				new CreditResponse(id, status, credit.get().getDescription(),
+						credit.get().getUser().getAccount().getAccountNumber(), credit.get().getCreatedAt(),
+						credit.get().getAmount()));
 
 	}
 

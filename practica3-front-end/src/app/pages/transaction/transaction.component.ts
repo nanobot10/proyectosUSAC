@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators  } from '@angular/forms';
 import { FormsService } from '../../services/forms.service';
 import { UserService } from '../../services/user.service';
 import Swal from 'sweetalert2';
+import { SwalService } from '../../services/swal.service';
 
 @Component({
   selector: 'app-transaction',
@@ -14,7 +15,10 @@ export class TransactionComponent implements OnInit {
   form: FormGroup;
   user: any;
 
-  constructor(private fb: FormBuilder, private fv: FormsService, private userService: UserService) { }
+  constructor(private fb: FormBuilder,
+              private fv: FormsService,
+              private userService: UserService,
+              private swalService: SwalService) { }
 
   ngOnInit() {
     this.getUserBalance();
@@ -25,7 +29,7 @@ export class TransactionComponent implements OnInit {
   }
 
   getUserBalance(){
-    this.userService.getUserBalance()
+    this.userService.getUserSummary()
     .subscribe( resp => {
       if (resp.success) {
         this.user = resp.data;
@@ -39,42 +43,23 @@ export class TransactionComponent implements OnInit {
       return this.fv.markFormGroupTouched(this.form);
     }
     if (this.form.value.amount > this.user.balance) {
-      this.showError('No tiene fondos suficientes');
+      this.swalService.showError('No tiene fondos suficientes');
       return;
     }
 
-    Swal.fire({
-      title: 'Espere',
-      text: 'Realizando Transferencia',
-      icon: 'info',
-      allowOutsideClick: false
-    });
-    Swal.showLoading();
+    this.swalService.showLoading('Realizando Transferencia');
     this.userService.doTransfer(this.form.value)
       .subscribe( resp => {
         if (resp.success) {
           this.getUserBalance();
-          Swal.fire({
-            title: 'Éxito',
-            text: 'Transferencia Realizada',
-            icon: 'success'
-          });
+          this.swalService.showSuccess('Éxito', 'Transferencia Realizada');
           this.form.reset();
         } else {
-          this.showError(resp.message);
+          this.swalService.showError(resp.message);
         }
       }, err => {
-
+          this.swalService.showUnknownError();
       } );
-  }
-
-
-  showError(message: string) {
-    Swal.fire({
-      title: 'Error',
-      text: message ,
-      icon: 'error'
-    });
   }
 
 
@@ -84,6 +69,10 @@ export class TransactionComponent implements OnInit {
 
   get amountValid() {
     return this.form.get('amount').invalid && this.form.get('amount').touched;
+  }
+
+  get userAdmin() {
+    return this.user.roles[0] === 'ROLE_ADMIN';
   }
 
 

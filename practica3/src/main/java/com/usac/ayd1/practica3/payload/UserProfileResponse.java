@@ -7,16 +7,29 @@ import com.usac.ayd1.practica3.entity.Role;
 
 public class UserProfileResponse {
 
+	private String name;
+	private String email;
 	private String username;
 	private String accountNumber;
 	private Integer userCode;
 	private List<String> roles;
 
-	public UserProfileResponse(String username, String accountNumber, Integer userCode, List<Role> roles) {
+	public UserProfileResponse(String name, String email, String username, String accountNumber, Integer userCode,
+			List<Role> roles) {
+		this.name = name;
+		this.email = email;
 		this.username = username;
 		this.accountNumber = accountNumber;
 		this.userCode = userCode;
 		this.roles = roles.stream().map(r -> r.getName().toString()).collect(Collectors.toList());
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getUsername() {
@@ -49,6 +62,14 @@ public class UserProfileResponse {
 
 	public void setRoles(List<String> roles) {
 		this.roles = roles;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 }

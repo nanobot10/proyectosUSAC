@@ -8,8 +8,6 @@ public class CreditRequest {
 	private Double amount;
 	@NotNull
 	private String description;
-	@NotNull
-	private String accountNumber;
 
 	public Double getAmount() {
 		return amount;
@@ -26,13 +24,4 @@ public class CreditRequest {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	public String getAccountNumber() {
-		return accountNumber;
-	}
-
-	public void setAccountNumber(String accountNumber) {
-		this.accountNumber = accountNumber;
-	}
-
 }

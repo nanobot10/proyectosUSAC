@@ -1,6 +1,7 @@
 package com.usac.ayd1.practica3.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.usac.ayd1.practica3.entity.Credit;
+import com.usac.ayd1.practica3.entity.Role;
 import com.usac.ayd1.practica3.entity.Transaction;
 import com.usac.ayd1.practica3.entity.User;
 import com.usac.ayd1.practica3.enums.Status;
@@ -46,10 +48,19 @@ public class UserService {
 		}
 		User user = getUserAuthenticated();
 		return new ApiResponse(true, "success",
-				new UserProfileResponse(user.getUsername(),
+				new UserProfileResponse(user.getName(), user.getEmail(), user.getUsername(),
 						user.getAccount() != null ? user.getAccount().getAccountNumber() : "", user.getUserCode(),
 						new ArrayList<>(user.getRoles())));
 
+	}
+
+	public ApiResponse delete(Long id) {
+		Optional<User> user = userRepository.findById(id);
+		if (!user.isPresent()) {
+			return new ApiResponse(false, "User not found");
+		}
+		userRepository.delete(user.get());
+		return new ApiResponse(true, "success");
 	}
 
 	public ApiResponse getUserBalance() {
@@ -98,22 +109,19 @@ public class UserService {
 
 	public ApiResponse applyForCredit(CreditRequest creditRequest) {
 
-		Optional<User> userTo = userRepository.findByAccountNumber(creditRequest.getAccountNumber());
-
-		if (!userTo.isPresent()) {
-			return new ApiResponse(false, "User with provided account number does not exist");
-		}
+		User userTo = getUserAuthenticated();
 
 		Credit credit = new Credit();
 		credit.setAmount(creditRequest.getAmount());
 		credit.setDescription(creditRequest.getDescription());
 		credit.setStatus(Status.PENDING);
-		credit.setUser(userTo.get());
+		credit.setUser(userTo);
 
 		creditRepository.saveAndFlush(credit);
 
-		return new ApiResponse(true, "success", new CreditResponse(credit.getId(), credit.getStatus(),
-				userTo.get().getAccount().getAccountNumber(), credit.getCreatedAt(), credit.getAmount()));
+		return new ApiResponse(true, "success",
+				new CreditResponse(credit.getId(), credit.getStatus(), credit.getDescription(),
+						userTo.getAccount().getAccountNumber(), credit.getCreatedAt(), credit.getAmount()));
 
 	}
 
@@ -141,16 +149,18 @@ public class UserService {
 		}
 		User user = getUserAuthenticated();
 
-		UserSummaryResponse userSummary = new UserSummaryResponse(user.getId(), user.getUsername(),
-				(user.getAccount() != null ? user.getAccount().getAccountNumber() : "no account"), user.getUserCode(),
-				mapCredits(user.getCredits()), mapTransactions(user.getTransactions()));
+		UserSummaryResponse userSummary = new UserSummaryResponse(user.getId(), user.getName(), user.getUsername(),
+				(user.getAccount() != null ? user.getAccount().getAccountNumber() : "no account"),
+				(user.getAccount() != null ? user.getAccount().getBalance() : Double.valueOf(0.0)),
+				mapCredits(user.getCredits()), mapTransactions(user.getTransactions()),
+				new ArrayList<>(user.getRoles()));
 
 		return new ApiResponse(true, "success", userSummary);
 	}
 
 	private List<CreditResponse> mapCredits(List<Credit> credits) {
 		return credits.stream()
-				.map(credit -> new CreditResponse(credit.getId(), credit.getStatus(),
+				.map(credit -> new CreditResponse(credit.getId(), credit.getStatus(), credit.getDescription(),
 						credit.getUser().getAccount().getAccountNumber(), credit.getCreatedAt(), credit.getAmount()))
 				.collect(Collectors.toList());
 	}

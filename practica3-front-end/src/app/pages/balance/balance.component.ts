@@ -13,12 +13,16 @@ export class BalanceComponent implements OnInit {
   constructor(private userService: UserService) { }
 
   ngOnInit() {
-    this.userService.getUserBalance()
+    this.userService.getUserSummary()
       .subscribe( resp => {
         if (resp.success) {
           this.user = resp.data;
         }
       }, err => console.log(err));
+  }
+
+  get userAdmin() {
+    return this.user.roles[0] === 'ROLE_ADMIN';
   }
 
 }
