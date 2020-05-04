@@ -43,6 +43,15 @@ export class UserService {
     });
   }
 
+  getAllUsers(accountNumber: string): Observable<APIResponse> {
+    return this.http.get<APIResponse>(endPoint, {
+      headers: this.getHeaders(),
+      params: {
+        accountNumber: accountNumber ? accountNumber : ''
+      }
+    });
+  }
+
 
   getHeaders(){
     return { Authorization: `Bearer ${localStorage.getItem('token')}`};

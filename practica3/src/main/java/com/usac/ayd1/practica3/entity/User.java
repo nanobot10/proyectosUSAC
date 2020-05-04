@@ -26,7 +26,7 @@ import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "username" }),
-		@UniqueConstraint(columnNames = { "email" }), @UniqueConstraint(columnNames = { "user_code" }) })
+		@UniqueConstraint(columnNames = { "user_code" }) })
 public class User extends UserDateAudit {
 
 	/**
@@ -68,7 +68,7 @@ public class User extends UserDateAudit {
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Credit> credits;
-	
+
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Transaction> transactions;
 

@@ -70,6 +70,10 @@ export class CreditComponent implements OnInit {
       return this.fv.markFormGroupTouched(this.form);
     }
 
+    if (this.form.value.amount <= 0) {
+      return this.swalService.showError('El monto debe ser mayor a 0');
+    }
+
     this.swalService.showLoading('Enviando Solicitud');
 
     this.userService.sendCredit(this.form.value)

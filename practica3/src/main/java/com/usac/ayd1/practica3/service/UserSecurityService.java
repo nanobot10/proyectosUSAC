@@ -21,6 +21,7 @@ import com.usac.ayd1.practica3.entity.Account;
 import com.usac.ayd1.practica3.entity.Role;
 import com.usac.ayd1.practica3.entity.User;
 import com.usac.ayd1.practica3.enums.RoleName;
+import com.usac.ayd1.practica3.enums.TransactionType;
 import com.usac.ayd1.practica3.exception.AppException;
 import com.usac.ayd1.practica3.payload.ApiResponse;
 import com.usac.ayd1.practica3.payload.JwtAuthenticationResponse;
@@ -51,10 +52,13 @@ public class UserSecurityService {
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
+	private AccountRepository accountRepository;
+
+	@Autowired
 	private JwtTokenProvider tokenProvider;
 
 	@Autowired
-	private AccountRepository accountRepository;
+	private TransactionService transactionService;
 
 	private AtomicInteger userCode;
 
@@ -90,10 +94,6 @@ public class UserSecurityService {
 			return new ApiResponse(false, "Username is already taken!");
 		}
 
-//		if (Boolean.TRUE.equals(userRepository.existsByEmail(signUpRequest.getEmail()))) {
-//			return new ApiResponse(false, "Email Address already in use!");
-//		}
-
 		User user = new User(signUpRequest.getName(), signUpRequest.getUsername(), userCode.incrementAndGet(),
 				signUpRequest.getEmail(), signUpRequest.getPassword());
 
@@ -110,7 +110,8 @@ public class UserSecurityService {
 		account.setBalance(Double.valueOf(1000.0));
 		account.setUser(user);
 		accountRepository.save(account);
-
+		transactionService.saveTransaction(user, account.getAccountNumber(), TransactionType.CREDIT,
+				account.getBalance(), "New Account");
 		return new ApiResponse(true, "User registered successfully", new SignUpResponse(userCode.get()));
 	}
 

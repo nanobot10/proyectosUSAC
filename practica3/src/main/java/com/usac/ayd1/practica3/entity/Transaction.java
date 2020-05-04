@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.usac.ayd1.practica3.enums.TransactionType;
 
 @Entity
@@ -30,6 +32,7 @@ public class Transaction extends UserDateAudit {
 	private TransactionType transactionType;
 	@Column(name = "amount")
 	private Double amount;
+	@JsonIgnoreProperties("transactions")
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;

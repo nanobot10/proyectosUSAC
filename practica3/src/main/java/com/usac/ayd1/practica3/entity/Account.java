@@ -8,6 +8,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "accounts", uniqueConstraints = { @UniqueConstraint(columnNames = "account_number") })
 public class Account {
@@ -17,9 +20,11 @@ public class Account {
 
 	@Column(name = "account_number")
 	private String accountNumber;
-	@Column(name = "balance")
+
+	@Column(name = "balance", columnDefinition = "decimal(19,2)")
 	private Double balance;
 
+	@JsonIgnoreProperties("account")
 	@OneToOne
 	@MapsId
 	private User user;

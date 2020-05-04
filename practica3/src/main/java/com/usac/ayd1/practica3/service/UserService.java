@@ -1,7 +1,6 @@
 package com.usac.ayd1.practica3.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,9 +8,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import com.usac.ayd1.practica3.entity.Account;
 import com.usac.ayd1.practica3.entity.Credit;
-import com.usac.ayd1.practica3.entity.Role;
 import com.usac.ayd1.practica3.entity.Transaction;
 import com.usac.ayd1.practica3.entity.User;
 import com.usac.ayd1.practica3.enums.Status;
@@ -26,6 +26,7 @@ import com.usac.ayd1.practica3.payload.TransferResponse;
 import com.usac.ayd1.practica3.payload.UserBalance;
 import com.usac.ayd1.practica3.payload.UserProfileResponse;
 import com.usac.ayd1.practica3.payload.UserSummaryResponse;
+import com.usac.ayd1.practica3.repository.AccountRepository;
 import com.usac.ayd1.practica3.repository.CreditRepository;
 import com.usac.ayd1.practica3.repository.UserRepository;
 import com.usac.ayd1.practica3.security.UserPrincipal;
@@ -35,7 +36,8 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;
-
+	@Autowired
+	private AccountRepository accountRepository;
 	@Autowired
 	private CreditRepository creditRepository;
 	@Autowired
@@ -142,6 +144,21 @@ public class UserService {
 		return user.get();
 	}
 
+	public ApiResponse getAllUsers(String accountNumber) {
+
+		List<Account> accounts = null;
+		if (StringUtils.isEmpty(accountNumber)) {
+			accounts = accountRepository.findAll();
+		} else {
+			accounts = accountRepository.findByAccountNumberContaining(accountNumber);
+		}
+		List<UserSummaryResponse> users = new ArrayList<>();
+		for (Account acc : accounts) {
+			users.add(createUserSummary(acc.getUser()));
+		}
+		return new ApiResponse(true, "success", users);
+	}
+
 	public ApiResponse getUserSummary() {
 
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -149,13 +166,17 @@ public class UserService {
 		}
 		User user = getUserAuthenticated();
 
-		UserSummaryResponse userSummary = new UserSummaryResponse(user.getId(), user.getName(), user.getUsername(),
-				(user.getAccount() != null ? user.getAccount().getAccountNumber() : "no account"),
-				(user.getAccount() != null ? user.getAccount().getBalance() : Double.valueOf(0.0)),
-				mapCredits(user.getCredits()), mapTransactions(user.getTransactions()),
-				new ArrayList<>(user.getRoles()));
+		UserSummaryResponse userSummary = createUserSummary(user);
 
 		return new ApiResponse(true, "success", userSummary);
+	}
+
+	private UserSummaryResponse createUserSummary(User user) {
+		return new UserSummaryResponse(user.getId(), user.getName(), user.getUsername(), user.getUserCode(),
+				user.getEmail(), (user.getAccount() != null ? user.getAccount().getAccountNumber() : "no account"),
+				(user.getAccount() != null ? user.getAccount().getBalance() : Double.valueOf(0.0)), user.getCreatedAt(),
+				mapCredits(user.getCredits()), mapTransactions(user.getTransactions()),
+				new ArrayList<>(user.getRoles()));
 	}
 
 	private List<CreditResponse> mapCredits(List<Credit> credits) {

@@ -38,13 +38,21 @@ export class TransactionComponent implements OnInit {
   }
 
   doTransfer() {
-
+    
     if (this.form.invalid) {
       return this.fv.markFormGroupTouched(this.form);
     }
+
+    if (this.form.value.accountNumber === this.user.accountNumber) {
+      return this.swalService.showError('No puedes trasferirte a tu propia cuenta');
+    }
+
+    if(this.form.value.amount <= 0){
+      return this.swalService.showError('El monto debe ser mayor a 0');
+    }
+
     if (this.form.value.amount > this.user.balance) {
-      this.swalService.showError('No tiene fondos suficientes');
-      return;
+      return this.swalService.showError('No tienes fondos suficientes');
     }
 
     this.swalService.showLoading('Realizando Transferencia');

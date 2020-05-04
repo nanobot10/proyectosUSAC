@@ -1,5 +1,6 @@
 package com.usac.ayd1.practica3.payload;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,19 +11,26 @@ public class UserSummaryResponse {
 	private Long id;
 	private String name;
 	private String username;
+	private Integer userCode;
+	private String email;
 	private String accountNumber;
 	private Double balance;
+	private Instant createdAt;
 	private List<CreditResponse> credits;
 	private List<TransactionResponse> transactions;
 	private List<String> roles;
 
-	public UserSummaryResponse(Long id, String name, String username, String accountNumber, Double balance,
-			List<CreditResponse> credits, List<TransactionResponse> transactions, List<Role> roles) {
+	public UserSummaryResponse(Long id, String name, String username, Integer userCode, String email,
+			String accountNumber, Double balance, Instant createdAt, List<CreditResponse> credits,
+			List<TransactionResponse> transactions, List<Role> roles) {
 		this.id = id;
 		this.name = name;
 		this.username = username;
+		this.setUserCode(userCode);
+		this.email = email;
 		this.accountNumber = accountNumber;
 		this.balance = balance;
+		this.createdAt = createdAt;
 		this.credits = credits;
 		this.transactions = transactions;
 		this.setRoles(roles.stream().map(r -> r.getName().toString()).collect(Collectors.toList()));
@@ -90,6 +98,30 @@ public class UserSummaryResponse {
 
 	public void setRoles(List<String> roles) {
 		this.roles = roles;
+	}
+
+	public Integer getUserCode() {
+		return userCode;
+	}
+
+	public void setUserCode(Integer userCode) {
+		this.userCode = userCode;
+	}
+
+	public Instant getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Instant createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 }
