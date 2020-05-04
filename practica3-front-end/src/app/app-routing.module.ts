@@ -36,7 +36,8 @@ const routes: Routes = [
   {
     path: 'balance', component: BalanceComponent,
     canActivate: [AuthGuardService]
-  }
+  },
+  { path: '**', redirectTo: 'home', pathMatch: 'full' }
 ]
 
 

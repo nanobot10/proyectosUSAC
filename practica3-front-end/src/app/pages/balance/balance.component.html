@@ -1,1 +1,12 @@
-<app-navbar></app-navbar>
+<div class="container mt-5 animated fadeIn fast">
+    <div class="card text-center">
+        <div class="card-header">
+            Saldo de la Cuenta
+        </div>
+        <div class="card-body text-left">
+            <p class="card-text">Nombre: <strong>{{user.name}}</strong> </p>
+            <p class="card-text">Número de Cuenta: <strong>{{user.accountNumber}}</strong> </p>
+            <p class="card-text">Saldo: <strong>{{ user.balance | number: '1.2-2' }}</strong> </p>
+        </div>
+    </div>
+</div>

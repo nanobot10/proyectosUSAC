@@ -3,22 +3,22 @@
     <form autocomplete="off" [formGroup]="form" (ngSubmit)="signUp()">
         <div class="form-group">
             <label>Nombre Completo</label>
-            <input type="text" placeholder="Nombre Completo" class="form-control" formControlName="name" [class.is-invalid]="nameValid">
+            <input type="text" placeholder="Nombre Completo" class="form-control" formControlName="name" [class.is-invalid]="nameValid" maxlength="255">
             <small *ngIf="nameValid" class="text-danger">El nombre es requerido</small>
         </div>
         <div class="form-group">
             <label>Usuario</label>
-            <input type="text" placeholder="Nombre de usuario" class="form-control" formControlName="username" [class.is-invalid]="usernameValid">
+            <input type="text" placeholder="Nombre de usuario" class="form-control" formControlName="username" [class.is-invalid]="usernameValid" maxlength="12">
             <small *ngIf="usernameValid" class="text-danger">El nombre de usuario es requerido</small>
         </div>
         <div class="form-group">
             <label>Correo</label>
-            <input type="email" placeholder="Correo" class="form-control" formControlName="email" [class.is-invalid]="emailValid">
+            <input type="email" placeholder="Correo" class="form-control" formControlName="email" [class.is-invalid]="emailValid" maxlength="40">
             <small *ngIf="emailValid" class="text-danger">El correo no es valido</small>
         </div>
         <div class="form-group">
             <label>Contraseña</label>
-            <input type="password" placeholder="Contraseña" class="form-control" formControlName="password" [class.is-invalid]="passwordValid">
+            <input type="password" placeholder="Contraseña" class="form-control" formControlName="password" [class.is-invalid]="passwordValid" maxlength="20">
             <ul *ngIf="passwordValid" class="text-danger">
                 <li><small class="text-danger">La contraseña debe ser de al menos de 8 caracteres</small></li>
                 <li><small class="text-danger">La contraseña debe contener al menos un digito</small></li>
@@ -28,5 +28,6 @@
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    <a [href]="'/login'">Login</a>
 
 </div>

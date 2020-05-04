@@ -42,24 +42,29 @@ export class LoginComponent implements OnInit {
     Swal.showLoading();
 
     this.loginService.doLogin(this.form.value)
-      .subscribe( (resp: any) => {
-        localStorage.setItem('token', resp);
-        this.router.navigate(['home']);
+      .subscribe( (resp) => {
+        if (resp.success) {
+          localStorage.setItem('token', resp.data.accessToken);
+          Swal.close();
+          this.router.navigate(['home']);
+        } else {
+          this.showError('Datos de inicio de sesión incorrectos');
+        }
       }, err => {
         if (err.status === 401) {
-          Swal.fire({
-            title: 'Error',
-            text: 'Datos de inicio de sesión incorrectos',
-            icon: 'error'
-          });
+          this.showError('Datos de inicio de sesión incorrectos');
         } else {
-          Swal.fire({
-            title: 'Error',
-            text: 'Ha ocurrido un error desconocido, intente más tarde' ,
-            icon: 'error'
-          });
+          this.showError('Ha ocurrido un error desconocido');
         }
       });
+  }
+
+  showError(message: string) {
+    Swal.fire({
+      title: 'Error',
+      text: message ,
+      icon: 'error'
+    });
   }
 
   get userCodeValid() {
