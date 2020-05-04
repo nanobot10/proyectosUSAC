@@ -90,9 +90,9 @@ public class UserSecurityService {
 			return new ApiResponse(false, "Username is already taken!");
 		}
 
-		if (Boolean.TRUE.equals(userRepository.existsByEmail(signUpRequest.getEmail()))) {
-			return new ApiResponse(false, "Email Address already in use!");
-		}
+//		if (Boolean.TRUE.equals(userRepository.existsByEmail(signUpRequest.getEmail()))) {
+//			return new ApiResponse(false, "Email Address already in use!");
+//		}
 
 		User user = new User(signUpRequest.getName(), signUpRequest.getUsername(), userCode.incrementAndGet(),
 				signUpRequest.getEmail(), signUpRequest.getPassword());

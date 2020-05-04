@@ -1,1 +1,32 @@
-<p>sign-up works!</p>
+<div class="container mt-5 animated fadeIn fast">
+
+    <form autocomplete="off" [formGroup]="form" (ngSubmit)="signUp()">
+        <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" placeholder="Nombre Completo" class="form-control" formControlName="name" [class.is-invalid]="nameValid">
+            <small *ngIf="nameValid" class="text-danger">El nombre es requerido</small>
+        </div>
+        <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" placeholder="Nombre de usuario" class="form-control" formControlName="username" [class.is-invalid]="usernameValid">
+            <small *ngIf="usernameValid" class="text-danger">El nombre de usuario es requerido</small>
+        </div>
+        <div class="form-group">
+            <label>Correo</label>
+            <input type="email" placeholder="Correo" class="form-control" formControlName="email" [class.is-invalid]="emailValid">
+            <small *ngIf="emailValid" class="text-danger">El correo no es valido</small>
+        </div>
+        <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" placeholder="Contraseña" class="form-control" formControlName="password" [class.is-invalid]="passwordValid">
+            <ul *ngIf="passwordValid" class="text-danger">
+                <li><small class="text-danger">La contraseña debe ser de al menos de 8 caracteres</small></li>
+                <li><small class="text-danger">La contraseña debe contener al menos un digito</small></li>
+                <li><small class="text-danger">La contraseña debe contener al menos una letra mayúscula</small></li>
+                <li><small class="text-danger">La contraseña debe contener al menos un caracter especial @$!%*?&</small></li>
+            </ul>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>

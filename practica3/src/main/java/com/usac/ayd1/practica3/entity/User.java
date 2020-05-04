@@ -43,7 +43,7 @@ public class User extends UserDateAudit {
 	private String name;
 
 	@NotBlank
-	@Size(max = 15)
+	@Size(max = 12)
 	private String username;
 
 	@Column(name = "user_code", updatable = false)
