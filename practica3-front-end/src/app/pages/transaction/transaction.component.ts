@@ -14,6 +14,7 @@ export class TransactionComponent implements OnInit {
 
   form: FormGroup;
   user: any;
+  transactions: any[] = [];
 
   constructor(private fb: FormBuilder,
               private fv: FormsService,
@@ -24,7 +25,7 @@ export class TransactionComponent implements OnInit {
     this.getUserBalance();
     this.form = this.fb.group({
       accountNumber: ['', Validators.required],
-      amount: ['', [Validators.required]]
+      amount: ['', [Validators.required, Validators.maxLength(19)]]
     });
   }
 
@@ -33,12 +34,26 @@ export class TransactionComponent implements OnInit {
     .subscribe( resp => {
       if (resp.success) {
         this.user = resp.data;
+        if (this.userAdmin) {
+          this.getAllTransactions();
+        }
       }
-    }, err => console.log(err));
+    }, err => this.swalService.showUnknownError());
+  }
+
+  getAllTransactions() {
+    this.userService.getAllTransactions()
+      .subscribe( resp => {
+        if (resp.success) {
+          this.transactions = resp.data;
+        } else {
+          this.swalService.showError(resp.message);
+        }
+      }, err => this.swalService.showUnknownError());
   }
 
   doTransfer() {
-    
+
     if (this.form.invalid) {
       return this.fv.markFormGroupTouched(this.form);
     }

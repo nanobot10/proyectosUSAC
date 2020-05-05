@@ -14,15 +14,19 @@ public class TransactionService {
 	@Autowired
 	private TransactionRepository transactionRepository;
 
-	public void saveTransaction(User user, String accountNumber, TransactionType transactionType, Double amount,
-			String description) {
+	public void saveTransaction(Transaction transaction) {
+		transactionRepository.save(transaction);
+	}
+
+	public Transaction createTransaction(User user, String accountNumber, TransactionType transactionType,
+			Double amount, String description) {
 		Transaction transaction = new Transaction();
 		transaction.setAccountNumber(accountNumber);
 		transaction.setTransactionType(transactionType);
 		transaction.setAmount(amount);
 		transaction.setUser(user);
 		transaction.setDescription(description);
-		transactionRepository.save(transaction);
+		return transaction;
 	}
 
 }

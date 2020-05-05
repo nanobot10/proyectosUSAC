@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.usac.ayd1.practica3.entity.Account;
 import com.usac.ayd1.practica3.entity.Credit;
@@ -28,6 +27,7 @@ import com.usac.ayd1.practica3.payload.UserProfileResponse;
 import com.usac.ayd1.practica3.payload.UserSummaryResponse;
 import com.usac.ayd1.practica3.repository.AccountRepository;
 import com.usac.ayd1.practica3.repository.CreditRepository;
+import com.usac.ayd1.practica3.repository.TransactionRepository;
 import com.usac.ayd1.practica3.repository.UserRepository;
 import com.usac.ayd1.practica3.security.UserPrincipal;
 
@@ -40,6 +40,8 @@ public class UserService {
 	private AccountRepository accountRepository;
 	@Autowired
 	private CreditRepository creditRepository;
+	@Autowired
+	private TransactionRepository transactionRepository;
 	@Autowired
 	private TransactionService transactionService;
 
@@ -101,10 +103,12 @@ public class UserService {
 		userRepository.save(userFrom);
 		userRepository.save(userTo.get());
 
-		transactionService.saveTransaction(userFrom, userTo.get().getAccount().getAccountNumber(),
-				TransactionType.DEBIT, transferRequest.getAmount(), "transfer between accounts");
-		transactionService.saveTransaction(userTo.get(), userFrom.getAccount().getAccountNumber(),
-				TransactionType.CREDIT, transferRequest.getAmount(), "transfer between accounts");
+		transactionService.saveTransaction(
+				transactionService.createTransaction(userFrom, userTo.get().getAccount().getAccountNumber(),
+						TransactionType.DEBIT, transferRequest.getAmount(), "transfer between accounts"));
+		transactionService.saveTransaction(
+				transactionService.createTransaction(userTo.get(), userFrom.getAccount().getAccountNumber(),
+						TransactionType.CREDIT, transferRequest.getAmount(), "transfer between accounts"));
 
 		return new ApiResponse(true, "success", new TransferResponse(userFrom.getAccount().getBalance()));
 	}
@@ -144,19 +148,20 @@ public class UserService {
 		return user.get();
 	}
 
-	public ApiResponse getAllUsers(String accountNumber) {
+	public ApiResponse getAllUsers() {
 
-		List<Account> accounts = null;
-		if (StringUtils.isEmpty(accountNumber)) {
-			accounts = accountRepository.findAll();
-		} else {
-			accounts = accountRepository.findByAccountNumberContaining(accountNumber);
-		}
+		List<Account> accounts = accountRepository.findAll();
+
 		List<UserSummaryResponse> users = new ArrayList<>();
 		for (Account acc : accounts) {
 			users.add(createUserSummary(acc.getUser()));
 		}
 		return new ApiResponse(true, "success", users);
+	}
+
+	public ApiResponse getAllTransactions() {
+		List<Transaction> transactions = transactionRepository.findAllByOrderByCreatedAtDesc();
+		return new ApiResponse(true, "success", mapTransactions(transactions));
 	}
 
 	public ApiResponse getUserSummary() {

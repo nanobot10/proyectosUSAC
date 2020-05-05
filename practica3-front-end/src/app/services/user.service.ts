@@ -43,12 +43,15 @@ export class UserService {
     });
   }
 
-  getAllUsers(accountNumber: string): Observable<APIResponse> {
+  getAllUsers(): Observable<APIResponse> {
     return this.http.get<APIResponse>(endPoint, {
-      headers: this.getHeaders(),
-      params: {
-        accountNumber: accountNumber ? accountNumber : ''
-      }
+      headers: this.getHeaders()
+    });
+  }
+
+  getAllTransactions(): Observable<APIResponse> {
+    return this.http.get<APIResponse>(`${endPoint}/transactions`, {
+      headers: this.getHeaders()
     });
   }
 

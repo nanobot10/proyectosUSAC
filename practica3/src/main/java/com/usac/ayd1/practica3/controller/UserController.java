@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.usac.ayd1.practica3.payload.ApiResponse;
@@ -42,19 +41,6 @@ public class UserController {
 		return ResponseEntity.ok(userService.applyForCredit(creditRequest));
 	}
 
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	@DeleteMapping("/{id}")
-	public ResponseEntity<ApiResponse> deleteUser(@PathVariable(name = "id") Long id) {
-		return ResponseEntity.ok(userService.delete(id));
-	}
-
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	@GetMapping
-	public ResponseEntity<ApiResponse> getAllUsersByAccountNumber(
-			@RequestParam(name = "accountNumber", required = false) String accountNumber) {
-		return ResponseEntity.ok(userService.getAllUsers(accountNumber));
-	}
-
 	@GetMapping("/user-profile")
 	public ResponseEntity<ApiResponse> getUser() {
 		return ResponseEntity.ok(userService.getUserProfile());
@@ -63,6 +49,24 @@ public class UserController {
 	@GetMapping("/user-summary")
 	public ResponseEntity<ApiResponse> getUserSummary() {
 		return ResponseEntity.ok(userService.getUserSummary());
+	}
+	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@DeleteMapping("/{id}")
+	public ResponseEntity<ApiResponse> deleteUser(@PathVariable(name = "id") Long id) {
+		return ResponseEntity.ok(userService.delete(id));
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@GetMapping
+	public ResponseEntity<ApiResponse> getAllUsersByAccountNumber() {
+		return ResponseEntity.ok(userService.getAllUsers());
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@GetMapping("/transactions")
+	public ResponseEntity<ApiResponse> getAllTransactions() {
+		return ResponseEntity.ok(userService.getAllTransactions());
 	}
 
 }

@@ -22,6 +22,10 @@ public class DebitService {
 
 	public ApiResponse makeDebit(DebitRequest debitRequest) {
 
+		if (debitRequest.getAmount() <= 0) {
+			return new ApiResponse(false, "The amount must be greater than zero");
+		}
+
 		Optional<User> user = userRepository.findByAccountNumber(debitRequest.getAccountNumber());
 
 		if (!user.isPresent()) {
@@ -34,8 +38,8 @@ public class DebitService {
 
 		user.get().getAccount().setBalance(user.get().getAccount().getBalance() - debitRequest.getAmount());
 		userRepository.save(user.get());
-		transactionService.saveTransaction(user.get(), "Bank Debit", TransactionType.DEBIT, debitRequest.getAmount(),
-				debitRequest.getDescription());
+		transactionService.saveTransaction(transactionService.createTransaction(user.get(), "Bank Debit",
+				TransactionType.DEBIT, debitRequest.getAmount(), debitRequest.getDescription()));
 
 		return new ApiResponse(true, "success", new DebitResponse(user.get().getAccount().getBalance()));
 

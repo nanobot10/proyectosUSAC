@@ -29,7 +29,7 @@ export class BalanceComponent implements OnInit {
   }
 
   getAllUsers() {
-    this.userService.getAllUsers(this.accountNumber)
+    this.userService.getAllUsers()
       .subscribe( resp => {
         if (resp.success) {
           this.users = resp.data;
@@ -37,12 +37,6 @@ export class BalanceComponent implements OnInit {
           this.swalService.showError(resp.message);
         }
       }, err => this.swalService.showUnknownError());
-  }
-
-  doFilter() {
-    if (this.accountNumber && this.accountNumber.length > 2) {
-      this.getAllUsers();
-    }
   }
 
   get userAdmin() {

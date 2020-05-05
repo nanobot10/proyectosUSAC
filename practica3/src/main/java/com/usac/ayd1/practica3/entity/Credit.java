@@ -26,7 +26,7 @@ public class Credit extends UserDateAudit {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@NotNull
-	@Column(name = "amount")
+	@Column(name = "amount", columnDefinition = "double(19,2)")
 	private Double amount;
 	@NotNull
 	@Column(name = "description")

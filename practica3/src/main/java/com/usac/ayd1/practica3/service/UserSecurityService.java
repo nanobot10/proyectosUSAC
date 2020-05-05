@@ -2,9 +2,7 @@ package com.usac.ayd1.practica3.service;
 
 import java.util.Collections;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.PostConstruct;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import com.usac.ayd1.practica3.entity.Account;
 import com.usac.ayd1.practica3.entity.Role;
@@ -60,19 +59,6 @@ public class UserSecurityService {
 	@Autowired
 	private TransactionService transactionService;
 
-	private AtomicInteger userCode;
-
-	@PostConstruct
-	private void initUserCode() {
-		log.info("*********************initUserCode***************");
-		Integer maxUserCode = userRepository.getMaxUserCode();
-		if (maxUserCode == null) {
-			userCode = new AtomicInteger(1000);
-		} else {
-			userCode = new AtomicInteger(maxUserCode);
-		}
-	}
-
 	public ApiResponse signin(LoginRequest loginRequest) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -81,8 +67,6 @@ public class UserSecurityService {
 		if (!ObjectUtils.nullSafeEquals(user.getUserCode(), loginRequest.getUserCode())) {
 			return new ApiResponse(false, "Invalid user code for username provided");
 		}
-
-		log.info("user principal code: {} - login request code: {}", user.getUserCode(), loginRequest.getUserCode());
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String jwt = tokenProvider.generateToken(authentication);
@@ -94,8 +78,16 @@ public class UserSecurityService {
 			return new ApiResponse(false, "Username is already taken!");
 		}
 
-		User user = new User(signUpRequest.getName(), signUpRequest.getUsername(), userCode.incrementAndGet(),
+		if (!validateUsername(signUpRequest.getUsername())) {
+			return new ApiResponse(false, "Username does not meet the restrictions");
+		}
+
+		User user = new User(signUpRequest.getName(), signUpRequest.getUsername(), getMaxUserCode(),
 				signUpRequest.getEmail(), signUpRequest.getPassword());
+
+		if (!validatePassword(user.getPassword())) {
+			return new ApiResponse(false, "Password does not meet the restrictions");
+		}
 
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -110,9 +102,31 @@ public class UserSecurityService {
 		account.setBalance(Double.valueOf(1000.0));
 		account.setUser(user);
 		accountRepository.save(account);
-		transactionService.saveTransaction(user, account.getAccountNumber(), TransactionType.CREDIT,
-				account.getBalance(), "New Account");
-		return new ApiResponse(true, "User registered successfully", new SignUpResponse(userCode.get()));
+		transactionService.saveTransaction(transactionService.createTransaction(user, account.getAccountNumber(),
+				TransactionType.CREDIT, account.getBalance(), "New Account"));
+		return new ApiResponse(true, "User registered successfully", new SignUpResponse(user.getUserCode()));
+	}
+
+	private boolean validatePassword(String password) {
+		return Pattern.compile("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&].{8,}")
+				.matcher(password).find();
+	}
+
+	private boolean validateUsername(String username) {
+		if (StringUtils.isEmpty(username)) {
+			return false;
+		}
+		return (username.length() >= 3 && username.length() <= 12)
+				&& Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$").matcher(username).find();
+	}
+
+	private Integer getMaxUserCode() {
+		Integer maxUserCode = userRepository.getMaxUserCode();
+		if (maxUserCode == null) {
+			return 1000 + 1;
+		} else {
+			return maxUserCode + 1;
+		}
 	}
 
 }

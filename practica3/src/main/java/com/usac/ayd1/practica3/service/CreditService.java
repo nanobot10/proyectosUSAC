@@ -61,8 +61,9 @@ public class CreditService {
 			credit.get().getUser().getAccount()
 					.setBalance(credit.get().getUser().getAccount().getBalance() + credit.get().getAmount());
 			userRepository.save(credit.get().getUser());
-			transactionService.saveTransaction(credit.get().getUser(), "Bank Credit id: " + credit.get().getId(),
-					TransactionType.CREDIT, credit.get().getAmount(), "approved credit");
+			transactionService.saveTransaction(transactionService.createTransaction(credit.get().getUser(),
+					"Bank Credit id: " + credit.get().getId(), TransactionType.CREDIT, credit.get().getAmount(),
+					"approved credit"));
 		}
 
 		credit.get().setStatus(status);
