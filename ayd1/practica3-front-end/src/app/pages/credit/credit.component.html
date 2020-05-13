@@ -1,0 +1,95 @@
+<app-profile></app-profile>
+<div class="container mt-5 animated fadeIn fast" *ngIf="user">
+    <div *ngIf="userAdmin">
+        <div *ngIf="credits.length > 0">
+            <h2>Solicitudes de Crédito</h2>
+            <table class="table table-hover table-responsive">
+                <thead>
+                    <tr>
+                        <th scope="col">Monto</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Número de Cuenta</th>
+                        <th scope="col">Fecha de Solicitud</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let credit of credits">
+                        <td> {{credit.amount | currency: 'USD'}} </td>
+                        <td> {{credit.description}} </td>
+                        <td> {{credit.accountNumber}} </td>
+                        <td> {{credit.createdAt | date: 'medium'}} </td>
+                        <td>
+                            <span class="badge badge-success" *ngIf="credit.status === 'APPROVED'">Aprobado</span>
+                            <span class="badge badge-danger" *ngIf="credit.status === 'DENIED'">Denegado</span>
+                            <span class="badge badge-warning" *ngIf="credit.status === 'PENDING'">Pendiente</span>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-success" *ngIf="credit.status === 'PENDING'" (click)="changeCreditStatus(credit.id, 'APPROVED')">
+                            <i class="fas fa-check-circle">Aprobar</i>
+                        </button>
+                            <button class="btn btn-sm btn-danger" *ngIf="credit.status === 'PENDING'" (click)="changeCreditStatus(credit.id, 'DENIED')">
+                            <i class="fas fa-times-circle">Denegar</i>
+                        </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" *ngIf="credits.length <= 0">
+            <strong>No existen creditos solicitados</strong>
+        </div>
+
+    </div>
+    <div *ngIf="!userAdmin">
+        <h2>Solicitar Crédito</h2>
+        <form [formGroup]="form" (ngSubmit)="sendCredit()">
+            <div class="form-group">
+                <label>Descripción</label>
+                <input type="text" formControlName="description" class="form-control" placeholder="Descripción" [class.is-invalid]="descriptionValid">
+                <small *ngIf="descriptionValid" class="text-danger">La descripción es requerida</small>
+            </div>
+            <div class="form-group">
+                <label>Monto</label>
+                <input type="number" formControlName="amount" class="form-control" placeholder="Monto" [class.is-invalid]="amountValid">
+                <small *ngIf="amountValid" class="text-danger">El monto es inválido</small>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline-success form-control">Solictar</button>
+            </div>
+        </form>
+        <hr>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" *ngIf="creditsIsEmpty">
+            <strong>No hay créditos solicitados</strong>
+        </div>
+        <div *ngIf="!creditsIsEmpty">
+            <h2>Créditos Solicitados</h2>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+
+                        <th scope="col">Monto</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Fecha de Solicitud</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let credit of user.credits">
+                        <td> {{credit.amount | currency: 'USD'}} </td>
+                        <td> {{credit.description}} </td>
+                        <td> {{credit.createdAt | date: 'medium'}} </td>
+                        <td>
+                            <span class="badge badge-success" *ngIf="credit.status === 'APPROVED'">Aprobado</span>
+                            <span class="badge badge-danger" *ngIf="credit.status === 'DENIED'">Denegado</span>
+                            <span class="badge badge-warning" *ngIf="credit.status === 'PENDING'">Pendiente</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>

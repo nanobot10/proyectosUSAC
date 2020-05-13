@@ -1,0 +1,53 @@
+<app-profile></app-profile>
+<div class="container mt-5 animated fadeIn fast" *ngIf="user">
+    <form [formGroup]="form" (ngSubmit)="doTransfer()" *ngIf="!userAdmin">
+        <h2>Realizar Transferencia</h2>
+        <div class="form-group">
+            <label>Número de Cuenta Destino</label>
+            <input type="text" formControlName="accountNumber" class="form-control" placeholder="Cuenta" [class.is-invalid]="accountNumberValid" maxlength="36">
+            <small *ngIf="accountNumberValid" class="text-danger">La cuenta destino es requerida</small>
+        </div>
+        <div class="form-group">
+            <label>Monto a Transferir</label>
+            <input type="number" formControlName="amount" class="form-control" placeholder="Monto" [class.is-invalid]="amountValid" ng-minlength="3" ng-maxlength="19">
+            <small *ngIf="user"> saldo:  {{user.balance | currency: 'USD'}} </small>
+            <small *ngIf="amountValid" class="text-danger">El monto es inválido</small>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-outline-success form-control">Transferir</button>
+        </div>
+    </form>
+    <div *ngIf="userAdmin">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" *ngIf="transactions.length <= 0">
+            <strong>No se han realizado transacciones</strong>
+        </div>
+        <div *ngIf="transactions.length > 0">
+            <h2>Historial de Transacciones</h2>
+            <table class="table table-hover table-responsive">
+                <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">Tipo Transacción</th>
+                        <th scope="col">Número de Cuenta</th>
+                        <th scope="col">Fecha de Creación</th>
+                        <th scope="col">Monto</th>
+                        <th scope="col">Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let t of transactions">
+                        <th scope="row"> {{t.id}} </th>
+                        <td>
+                            <span class="badge badge-success" *ngIf="t.transactionType === 'CREDIT'">Credito</span>
+                            <span class="badge badge-danger" *ngIf="t.transactionType === 'DEBIT'">Debito</span>
+                        </td>
+                        <td> {{t.accountNumber}} </td>
+                        <td> {{t.createdAt | date: 'medium'}} </td>
+                        <td> {{t.amount | currency: 'USD'}} </td>
+                        <td> {{t.description}} </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
